@@ -1,4 +1,4 @@
-# Speech-to-Speech Chatbot
+# AI-Chatbot
 
 A lightweight AI chatbot that accepts questions by text or microphone and reads AI responses aloud. The frontend is built with React and Vite, while the backend uses FastAPI and the Groq API.
 
