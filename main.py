@@ -10,7 +10,7 @@ load_dotenv()
 # FastAPI app
 app = FastAPI()
 
-# React frontend ko allow karo
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -25,11 +25,8 @@ app.add_middleware(
 # Groq API key
 api_key = os.getenv("GROQ_API")
 
-if not api_key:
-    raise ValueError("GROQ_API is not found in .env")
-
-# Groq client
-client = Groq(api_key=api_key)
+# Keep the app running even if the key is missing; report it clearly at request time.
+client = Groq(api_key=api_key) if api_key else None
 
 
 # Home route
@@ -43,6 +40,11 @@ def home():
 # AI question route
 @app.post("/ask")
 def ask(data: dict):
+
+    if client is None:
+        return {
+            "error": "GROQ_API is not configured. Add it to your .env file before calling /ask."
+        }
 
     question = data.get("text")
 
