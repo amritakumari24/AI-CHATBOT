@@ -56,7 +56,7 @@ def ask(data: dict):
             messages=[
                 {
                     "role": "system",
-                    "content": "answer only question is aksed."
+                    "content": "Respond naturally and conversationally to every user message. Answer exactly what the user asks and match the tone and simplicity of the question. For greetings such as 'hi', 'hello', 'hey', or 'good morning', respond with a short, friendly greeting and optionally ask how you can help. For simple questions such as 'tell me a fun fact', provide a concise, interesting and accurate answer without unnecessary explanation. Do not treat greetings or casual conversation as questions that require a detailed answer. Avoid robotic phrases such as 'I'm not sure how to answer that', 'I don't know how to respond', or 'I cannot answer that'. If the user asks a clear question, answer it directly. If the request is unclear, ask a brief and natural clarifying question."
                 },
                 {
                     "role": "user",

@@ -1,5 +1,5 @@
 .app-shell {
-  width: min(1100px, calc(100% - 36px));
+  width: min(1500px, calc(100% - 40px));
   margin: 0 auto;
   padding: 18px 0 28px;
 }
@@ -57,8 +57,14 @@
   padding: 24px 26px 18px;
 }
 
+.chat-started {
+  min-height: calc(100vh - 150px);
+  display: flex;
+  flex-direction: column;
+}
+
 .chat-idle {
-  min-height: 680px;
+  min-height: calc(100vh - 150px);
 }
 
 .welcome-panel {
@@ -119,8 +125,9 @@
 
 .chat-area {
   position: relative;
-  min-height: 480px;
-  max-height: 560px;
+  min-height: clamp(420px, 58vh, 760px);
+  flex: 1;
+  max-height: none;
   overflow-y: auto;
   padding: 18px 8px 10px;
   background: rgba(246, 248, 250, 0.5);
@@ -197,6 +204,17 @@
   border: 1px solid rgba(122, 103, 70, 0.08);
 }
 
+/* .assistant-speaking {
+  max-width: min(88%, 980px);
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  line-height: 1.7;
+} */
+
 .assistant-bubble p:first-child {
   margin-top: 0;
 }
@@ -254,6 +272,7 @@
 }
 
 .play-button,
+/* .pause-button, */
 .stop-button {
   border: none;
   cursor: pointer;
@@ -266,6 +285,13 @@
   font-weight: 700;
   padding: 0;
 }
+
+/* .pause-button {
+  background: transparent;
+  color: #2c90d8;
+  font-weight: 700;
+  padding: 0;
+} */
 
 .stop-button {
   background: #f7dfe9;
@@ -435,7 +461,8 @@
 
 @media (max-width: 760px) {
   .app-shell {
-    width: min(100% - 18px, 1100px);
+    width: calc(100% - 18px);
+    padding-top: 10px;
   }
 
   .chat-panel {
@@ -443,7 +470,7 @@
   }
 
   .chat-area {
-    min-height: 390px;
+    min-height: clamp(390px, 62vh, 620px);
     padding: 14px 6px 8px;
   }
 
@@ -453,6 +480,11 @@
     padding: 14px 16px;
     font-size: 0.96rem;
   }
+  /* .assistant-speaking {
+    max-width: 100%;
+    padding: 6px 0;
+    font-size: 1.04rem;
+  } */
 
   .play-row {
     margin-left: 60px;

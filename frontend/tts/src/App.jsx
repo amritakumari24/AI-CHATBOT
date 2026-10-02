@@ -16,6 +16,8 @@ function App() {
   const [isListening, setIsListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(true);
   const [speaking, setSpeaking] = useState(false);
+  const [speechPaused, setSpeechPaused] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState(null);
   const recognitionRef = useRef(null);
   const chatRef = useRef(null);
 
@@ -63,7 +65,7 @@ function App() {
     }
   }, [messages, loading]);
 
-  const speakText = (value) => {
+  const speakText = (value, messageId = null) => {
     if (!value) return Promise.resolve();
 
     return new Promise((resolve) => {
@@ -74,13 +76,21 @@ function App() {
       utterance.pitch = 1;
       utterance.volume = 1;
 
-      utterance.onstart = () => setSpeaking(true);
+      utterance.onstart = () => {
+        setSpeaking(true);
+        setSpeechPaused(false);
+        setSpeakingMessageId(messageId);
+      };
       utterance.onend = () => {
         setSpeaking(false);
+        setSpeechPaused(false);
+        setSpeakingMessageId(null);
         resolve();
       };
       utterance.onerror = () => {
         setSpeaking(false);
+        setSpeechPaused(false);
+        setSpeakingMessageId(null);
         resolve();
       };
 
@@ -91,6 +101,20 @@ function App() {
   const stopSpeaking = () => {
     window.speechSynthesis.cancel();
     setSpeaking(false);
+    setSpeechPaused(false);
+    setSpeakingMessageId(null);
+  };
+
+  const toggleSpeechPause = () => {
+    if (!speaking) return;
+
+    if (speechPaused) {
+      window.speechSynthesis.resume();
+      setSpeechPaused(false);
+    } else {
+      window.speechSynthesis.pause();
+      setSpeechPaused(true);
+    }
   };
 
   const sendQuestion = async (promptText = text) => {
@@ -121,13 +145,15 @@ function App() {
       }
 
       const aiText = data.answer || "I’m not sure how to answer that right now.";
+      const assistantMessageId = Date.now() + "-assistant";
 
       setMessages((current) => [
         ...current,
-        { id: Date.now() + "-assistant", sender: "assistant", text: aiText },
+        { id: assistantMessageId, sender: "assistant", text: aiText },
       ]);
 
-      await speakText(aiText);
+      setLoading(false);
+      await speakText(aiText, assistantMessageId);
     } catch (error) {
       console.error(error);
       setMessages((current) => [
@@ -180,14 +206,23 @@ function App() {
                   </div>
                 )}
 
-                <div className={message.sender === "user" ? "user-bubble" : "assistant-bubble"}>
+                <div
+                  className={message.sender === "user" ? "user-bubble" : `assistant-bubble ${speakingMessageId === message.id ? "assistant-speaking" : ""}`}
+                >
                   {message.sender === "user" ? message.text : <ReactMarkdown>{message.text}</ReactMarkdown>}
                   {message.sender === "assistant" && (
                     <div className="play-row">
-                      <button type="button" className="play-button" onClick={() => speakText(message.text)}>
+                      <button type="button" className="play-button" onClick={() => speakText(message.text, message.id)}>
                         ▶ Play
                       </button>
-                      {speaking && <button type="button" className="stop-button" onClick={stopSpeaking}>Stop</button>}
+                      {speakingMessageId === message.id && (
+                        <>
+                          {/* <button type="button" className="pause-button" onClick={toggleSpeechPause}>
+                            {speechPaused ? "▶ Resume" : "Ⅱ Pause"}
+                          </button> */}
+                          <button type="button" className="stop-button" onClick={stopSpeaking}>Stop</button>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
