@@ -26,7 +26,8 @@
 .brand-mark { display: grid; place-items: center; border-radius: 50%; background: #2f2f2f; color: #f3d34a; line-height: 1; }
 .close-drawer { display: block; border: none; background: transparent; color: #a7a7a7; font-size: 1.45rem; cursor: pointer; }
 .new-chat-button { width: 100%; padding: 10px 11px; border: 1px solid #3d3d3d; border-radius: 8px; background: transparent; color: #f1f1f1; text-align: left; cursor: pointer; }
-.new-chat-button:hover, .history-item:hover { background: #2a2a2a; }
+.new-chat-button:hover { color: #000; }
+.new-chat-button:hover, .history-item:hover { background: #0000008b; }
 .new-chat-button span { margin-right: 7px; font-size: 1.05rem; }
 .history-label { margin: 22px 10px 8px; color: #8d8d8d; font-size: 0.7rem; font-weight: 700; }
 .history-list { display: grid; gap: 2px; }
@@ -37,6 +38,9 @@
 .history-item-copy strong { overflow: hidden; color: #e3e3e3; font-size: 0.78rem; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .history-item-copy small { color: #858585; font-size: 0.67rem; }
 .completed-dot { color: #79c99b; font-size: 0.72rem; }
+.history-delete { display: none; place-items: center; flex: 0 0 auto; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: #a7a7a7; font-size: 1rem; line-height: 1; cursor: pointer; }
+.history-item:hover .history-delete, .history-item:focus-within .history-delete { display: grid; }
+.history-delete:hover, .history-delete:focus-visible { background: #3a3a3a; color: #f08a8a; }
 .empty-history { margin: 12px 8px; color: #858585; font-size: 0.78rem; line-height: 1.5; }
 .drawer-backdrop { position: fixed; z-index: 9; inset: 0; border: none; background: rgba(0, 0, 0, 0.48); cursor: pointer; }
 
@@ -136,6 +140,7 @@
 .light-theme .sidebar-brand .brand-mark { background: #f6e7a8; color: #f3b500; }
 .light-theme .close-drawer { color: #718092; }
 .light-theme .new-chat-button { border-color: #dbe6ef; background: #253c52; color: #fff; }
+.light-theme .new-chat-button:hover { color: #000; }
 .light-theme .new-chat-button:hover, .light-theme .history-item:hover, .light-theme .history-item.selected { background: #eef5fb; }
 .light-theme .history-label { color: #8993a1; }
 .light-theme .history-item { color: #536274; }

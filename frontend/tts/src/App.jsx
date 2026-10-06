@@ -4,6 +4,7 @@ import "./App.css";
 
 const MAX_QUESTIONS = 20;
 const STORAGE_KEY = "talky-chat-history";
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://127.0.0.1:8000" : "https://ai-chatbot-backend-3ifb.onrender.com");
 const suggestedPrompts = ["Tell me a fun fact", "Why is the sky blue?", "Tell me about animals", "Help me learn something new"];
 
 const createChat = () => ({
@@ -100,6 +101,23 @@ function App() {
     stopSpeaking();
   };
 
+  const deleteChat = (chatId) => {
+    const chatToDelete = chats.find((chat) => chat.id === chatId);
+    if (!chatToDelete || !window.confirm(`Delete "${chatToDelete.title}"?`)) return;
+
+    const remainingChats = chats.filter((chat) => chat.id !== chatId);
+    if (chatId === activeChatId) {
+      const nextChat = remainingChats.find((chat) => chat.messages.length) || remainingChats[0] || createChat();
+      setActiveChatId(nextChat.id);
+      setText("");
+      stopSpeaking();
+      setChats(remainingChats.length ? remainingChats : [nextChat]);
+      return;
+    }
+
+    setChats(remainingChats);
+  };
+
   const speakText = (value, messageId = null) => {
     if (!value) return Promise.resolve();
     return new Promise((resolve) => {
@@ -148,6 +166,10 @@ function App() {
     const chatId = activeChat.id;
     const questionNumber = questionCount + 1;
     const userMessage = { id: `${Date.now()}-user`, sender: "user", text: trimmed };
+    const conversationHistory = messages.map((message) => ({
+      role: message.sender === "user" ? "user" : "assistant",
+      content: message.text,
+    }));
     updateChat(chatId, (chat) => ({
       ...chat,
       title: chat.messages.length ? chat.title : `${trimmed.slice(0, 42)}${trimmed.length > 42 ? "..." : ""}`,
@@ -160,10 +182,10 @@ function App() {
 
     let aiText;
     try {
-      const response = await fetch("https://ai-chatbot-backend-3ifb.onrender.com/ask", {
+      const response = await fetch(`${API_BASE_URL}/ask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: trimmed }),
+        body: JSON.stringify({ text: trimmed, history: conversationHistory }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Backend error");
@@ -200,7 +222,7 @@ function App() {
         <button type="button" className="new-chat-button" onClick={startNewChat}><span>＋</span> New Chat</button>
         <div className="history-label">Your conversations</div>
         <nav className="history-list" aria-label="Chat history">
-          {visibleChats.filter((chat) => chat.messages.length).map((chat) => <button key={chat.id} type="button" className={`history-item ${chat.id === activeChatId ? "selected" : ""}`} onClick={() => selectChat(chat.id)}><span className="history-icon">◌</span><span className="history-item-copy"><strong>{chat.title}</strong><small>{chat.questionCount}/{MAX_QUESTIONS} questions</small></span>{chat.completed && <span className="completed-dot" aria-label="Completed">✓</span>}</button>)}
+          {visibleChats.filter((chat) => chat.messages.length).map((chat) => <div key={chat.id} className={`history-item ${chat.id === activeChatId ? "selected" : ""}`} role="button" tabIndex={0} aria-current={chat.id === activeChatId ? "page" : undefined} onClick={() => selectChat(chat.id)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") selectChat(chat.id); }}><span className="history-icon">◌</span><span className="history-item-copy"><strong>{chat.title}</strong><small>{chat.questionCount}/{MAX_QUESTIONS} questions</small></span>{chat.completed && <span className="completed-dot" aria-label="Completed">✓</span>}<button type="button" className="history-delete" aria-label={`Delete ${chat.title}`} title="Delete chat" onClick={(event) => { event.stopPropagation(); deleteChat(chat.id); }} onKeyDown={(event) => event.stopPropagation()}>🗑</button></div>)}
           {!chats.some((chat) => chat.messages.length) && <p className="empty-history">Your conversations will appear here.</p>}
         </nav>
       </aside>
