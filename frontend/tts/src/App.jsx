@@ -125,7 +125,7 @@ function App() {
       const utterance = new SpeechSynthesisUtterance(value);
       utterance.lang = "en-US";
       utterance.rate = 1;
-      utterance.pitch = 1;
+      utterance.pitch = 1.2;
       utterance.volume = 1;
       utterance.onstart = () => {
         setSpeaking(true);
